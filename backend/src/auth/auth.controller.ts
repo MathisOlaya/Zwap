@@ -4,11 +4,13 @@ import { JwtService } from '@nestjs/jwt';
 
 // DTOs
 import { LoginUserDto } from './dto/login.dto';
+import { SanitizedUserDto } from './dto/sanitized-user.dto';
+import { RegisterUserDto } from './dto/register.dto';
 
 // Services
 import { AuthService } from './auth.service';
 import { CookiesService } from 'src/cookies/cookies.service';
-import { SanitizedUserDto } from './dto/sanitized-user.dto';
+import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,13 +26,30 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     // Valide user CREDS
-    const user: SanitizedUserDto =
+    const user: SanitizedUserJwtDto =
       await this.authService.validateUser(userEntry);
 
     // Generating a JWT Token
-    const token = await this.jwtService.signAsync(user);
+    const token = await this.jwtService.sign(user);
 
     // Save it into a secured cookie
+    this.cookiesService.store(res, 'access_token', token);
+  }
+
+  @Post('register')
+  async register(
+    @Body() userEntry: RegisterUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    // Register user
+    const user: SanitizedUserJwtDto =
+      await this.authService.registerUser(userEntry);
+
+    // Generate JWT Token and store it into cookies
+    const token = await this.jwtService.sign({
+      id: user.id,
+      email: user.email,
+    });
     this.cookiesService.store(res, 'access_token', token);
   }
 }
