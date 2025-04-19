@@ -34,3 +34,10 @@ export class AuthService {
 
     return this.sanitizeUser(user);
   }
+  sanitizeUser(user: User) {
+    // Remove password from USER
+    const { password, ...sanitizedUser } = user;
+
+    return sanitizedUser;
+  }
+}
