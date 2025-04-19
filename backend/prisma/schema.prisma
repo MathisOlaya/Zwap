@@ -16,7 +16,12 @@ datasource db {
 // Models 
 model User {
   id  Int @id @default(autoincrement())
-  username String @unique
+  firstname String
+  name String?
   email String @unique
   password String
+  phoneNumber String @unique
+  profile_picture String?
+  rate Int @default(0)
+  createdAt DateTime @default(now())
 }
