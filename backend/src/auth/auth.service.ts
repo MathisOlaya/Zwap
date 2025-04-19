@@ -40,4 +40,12 @@ export class AuthService {
 
     return sanitizedUser;
   }
+  sanitizeUserJwt(user: User) {
+    const sanitizedUser: SanitizedUserJwtDto = {
+      id: user.id,
+      email: user.email,
+    };
+
+    return sanitizedUser;
+  }
 }
