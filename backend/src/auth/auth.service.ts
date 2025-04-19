@@ -35,7 +35,7 @@ export class AuthService {
     }
 
     // Compare password
-    if (await !bcrypt.compare(password, user.password)) {
+    if (!(await bcrypt.compare(password, user.password))) {
       throw new BadRequestException('Identifiants incorrectes');
     }
 

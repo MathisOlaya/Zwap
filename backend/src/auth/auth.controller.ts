@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Req } from '@nestjs/common';
+import { Body, Controller, Post, Res, Req, HttpCode } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
@@ -21,6 +21,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @HttpCode(200)
   async login(
     @Body() userEntry: LoginUserDto,
     @Res({ passthrough: true }) res: Response,
