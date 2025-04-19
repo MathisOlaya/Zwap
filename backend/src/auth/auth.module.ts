@@ -3,6 +3,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 
+// Services
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CookiesService } from 'src/cookies/cookies.service';
+
 @Module({
   imports: [
     JwtModule.register({
@@ -10,7 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: process.env.JWT_EXPIRES },
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, PrismaService, CookiesService],
   controllers: [AuthController],
 })
 export class AuthModule {}
