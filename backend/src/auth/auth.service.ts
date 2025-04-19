@@ -1,16 +1,23 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 
 // Models
 import { PrismaService } from 'src/prisma/prisma.service';
 
 // DTOs
 import { LoginUserDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register.dto';
 
 // Dependencies
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 // Models
 import { User } from '@prisma/client';
+import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +39,33 @@ export class AuthService {
       throw new BadRequestException('Identifiants incorrectes');
     }
 
-    return this.sanitizeUser(user);
+    return this.sanitizeUserJwt(user);
+  }
+  async registerUser(userInput: RegisterUserDto) {
+    // Are email & PhoneNumber available
+    if (!(await this.isEmailUnique(userInput.email))) {
+      throw new HttpException(
+        'Cet email est déjà utilisé.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (!(await this.isPhoneNumberUnique(userInput.phoneNumber))) {
+      throw new HttpException(
+        'Ce numéro de téléphone est déjà utilisé.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    // Hash password using Bcrypt
+    const password: string = await bcrypt.hash(userInput.password, 10);
+
+    // Store user into DB
+    const user: User = await this.prisma.user.create({
+      data: { ...userInput, password: password },
+    });
+
+    return this.sanitizeUserJwt(user);
   }
   sanitizeUser(user: User) {
     // Remove password from USER
