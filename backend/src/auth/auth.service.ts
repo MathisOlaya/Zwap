@@ -48,4 +48,16 @@ export class AuthService {
 
     return sanitizedUser;
   }
+  async isEmailUnique(email: string) {
+    if (
+      await this.prisma.user.findFirst({
+        where: {
+          email,
+        },
+      })
+    ) {
+      return false;
+    }
+    return true;
+  }
 }
