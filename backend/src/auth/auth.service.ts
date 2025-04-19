@@ -60,4 +60,16 @@ export class AuthService {
     }
     return true;
   }
+  async isPhoneNumberUnique(phone: string) {
+    if (
+      await this.prisma.user.findFirst({
+        where: {
+          phoneNumber: phone,
+        },
+      })
+    ) {
+      return false;
+    }
+    return true;
+  }
 }
