@@ -10,6 +10,6 @@ import { MailModule } from './mail/mail.module';
 @Module({
   imports: [AuthModule, MailModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService, CookiesService, MailService],
+  providers: [AppService, PrismaService, CookiesService],
 })
 export class AppModule {}
