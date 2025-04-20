@@ -74,8 +74,6 @@ export class AuthService {
         where: { email },
         data: { password: hashedPassowrd },
       });
-
-      console.log(user);
     } catch (err) {
       throw new HttpException(
         'Erreur lors de la modification du mot de passe',

@@ -6,6 +6,9 @@ import {
   Req,
   HttpCode,
   Get,
+  Param,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -14,7 +17,8 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.dto';
 import { RegisterUserDto } from './dto/register.dto';
 import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
-import { ResetPasswordDto } from './dto/password-reseting.dto';
+import { ResetPasswordMailDto } from './dto/password-reseting-request.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 // Services
 import { AuthService } from './auth.service';
@@ -65,7 +69,43 @@ export class AuthController {
   }
 
   @Get('reset-password')
-  async requestPasswordReseting(@Body() infos: ResetPasswordDto) {
+  async requestPasswordReseting(@Body() infos: ResetPasswordMailDto) {
     await this.mailService.sendResetPassword(infos.email);
+  }
+
+  @Post('reset-password/:key')
+  async resetPassword(
+    @Param('key') key: string,
+    @Body() creds: ResetPasswordDto,
+  ) {
+    if (key === ':key') {
+      throw new HttpException(
+        'Clé de réinitialisation manquante',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // Checking token validity
+    try {
+      const payload = await this.jwtService.verify(key);
+
+      await this.authService.updatePassword(payload.email, creds.password);
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') {
+        throw new HttpException(
+          'Le lien de réinitialisation a expiré.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      if (err.name === 'JsonWebTokenError') {
+        throw new HttpException(
+          "Le lien de réinitialisation n'est pas valide",
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      throw new HttpException(
+        'Erreur lors de la modification du mot de passe',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
