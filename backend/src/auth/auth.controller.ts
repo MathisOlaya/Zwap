@@ -1,16 +1,25 @@
-import { Body, Controller, Post, Res, Req, HttpCode } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  Req,
+  HttpCode,
+  Get,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
 // DTOs
 import { LoginUserDto } from './dto/login.dto';
-import { SanitizedUserDto } from './dto/sanitized-user.dto';
 import { RegisterUserDto } from './dto/register.dto';
+import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
+import { ResetPasswordDto } from './dto/password-reseting.dto';
 
 // Services
 import { AuthService } from './auth.service';
 import { CookiesService } from 'src/cookies/cookies.service';
-import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Controller('auth')
 export class AuthController {
@@ -18,6 +27,7 @@ export class AuthController {
     private readonly jwtService: JwtService,
     private readonly authService: AuthService,
     private readonly cookiesService: CookiesService,
+    private readonly mailService: MailService,
   ) {}
 
   @Post('login')
@@ -52,5 +62,10 @@ export class AuthController {
       email: user.email,
     });
     this.cookiesService.store(res, 'access_token', token);
+  }
+
+  @Get('reset-password')
+  async requestPasswordReseting(@Body() infos: ResetPasswordDto) {
+    await this.mailService.sendResetPassword(infos.email);
   }
 }
