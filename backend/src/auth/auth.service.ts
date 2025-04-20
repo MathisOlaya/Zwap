@@ -105,4 +105,18 @@ export class AuthService {
     }
     return true;
   }
+  async emailExists(email: string): Promise<boolean> {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { email },
+      });
+      return user ? true : false;
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur:", error);
+      throw new HttpException(
+        "Impossible de récupérer l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
