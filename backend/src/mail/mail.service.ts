@@ -31,4 +31,17 @@ export class MailService {
       throw new Error('Failed to refresh token');
     }
   }
+  async isTokenExpired() {
+    const token = await this.prisma.token.findFirst({
+      where: {
+        type: 'Zoho',
+      },
+    });
+
+    if (!token) {
+      throw new Error('Impossible de récupérer le token');
+    }
+
+    return Date.now() > token.expiresIn;
+  }
 }
