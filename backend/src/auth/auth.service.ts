@@ -67,6 +67,23 @@ export class AuthService {
 
     return this.sanitizeUserJwt(user);
   }
+  async updatePassword(email: string, password: string) {
+    try {
+      const hashedPassowrd = await bcrypt.hash(password, 10);
+      const user = await this.prisma.user.update({
+        where: { email },
+        data: { password: hashedPassowrd },
+      });
+
+      console.log(user);
+    } catch (err) {
+      throw new HttpException(
+        'Erreur lors de la modification du mot de passe',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   sanitizeUser(user: User) {
     // Remove password from USER
     const { password, ...sanitizedUser } = user;
