@@ -67,6 +67,21 @@ export class AuthService {
 
     return this.sanitizeUserJwt(user);
   }
+  async updatePassword(email: string, password: string) {
+    try {
+      const hashedPassowrd = await bcrypt.hash(password, 10);
+      const user = await this.prisma.user.update({
+        where: { email },
+        data: { password: hashedPassowrd },
+      });
+    } catch (err) {
+      throw new HttpException(
+        'Erreur lors de la modification du mot de passe',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   sanitizeUser(user: User) {
     // Remove password from USER
     const { password, ...sanitizedUser } = user;
@@ -104,5 +119,19 @@ export class AuthService {
       return false;
     }
     return true;
+  }
+  async emailExists(email: string): Promise<boolean> {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { email },
+      });
+      return user ? true : false;
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur:", error);
+      throw new HttpException(
+        "Impossible de récupérer l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

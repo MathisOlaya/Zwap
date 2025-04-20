@@ -29,6 +29,7 @@ model User {
 model Token{
   id Int @id @default(autoincrement())
   type TokenType @unique
+  key String
   expiresIn BigInt
 }
 
