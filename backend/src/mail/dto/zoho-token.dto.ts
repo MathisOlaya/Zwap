@@ -6,5 +6,6 @@ import { TokenType } from '@prisma/client';
 export class ZohoTokenDto {
   id: number;
   type: TokenType;
+  key: string;
   expiresIn: bigint;
 }
