@@ -25,3 +25,13 @@ model User {
   rate Int @default(0)
   createdAt DateTime @default(now())
 }
+
+model Token{
+  id Int @id @default(autoincrement())
+  type TokenType @unique
+  expiresIn BigInt
+}
+
+enum TokenType{
+  Zoho
+}
