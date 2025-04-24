@@ -46,7 +46,6 @@ export class MailService {
         const url = `https://accounts.zoho.eu/oauth/v2/token?refresh_token=${process.env.ZOHO_REFRESH_TOKEN}&client_id=${process.env.ZOHO_CLIENT_ID}&client_secret=${process.env.ZOHO_CLIENT_SECRET}&grant_type=refresh_token`;
         // Fetching API for new access_token
         const response = await firstValueFrom(this.httpService.post(url));
-        console.log(response);
 
         // Getting new access token
         const newAccessToken = response.data.access_token;
@@ -84,7 +83,7 @@ export class MailService {
     // Does the email exists ?
     if (!(await this.authService.emailExists(email))) {
       throw new HttpException(
-        "Aucun compte n'existe avec cet adresse mail",
+        "Aucun compte n'existe avec cette adresse mail",
         HttpStatus.NOT_FOUND,
       );
     }
