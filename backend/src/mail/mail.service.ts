@@ -39,7 +39,6 @@ export class MailService {
     return token?.key;
   }
   async refreshToken() {
-    console.log(await this.isTokenExpired());
     if (await this.isTokenExpired()) {
       try {
         // Getting query from ENV file

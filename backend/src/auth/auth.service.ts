@@ -14,6 +14,7 @@ import { RegisterUserDto } from './dto/register.dto';
 
 // Dependencies
 import * as bcrypt from 'bcrypt';
+import { Response } from 'express';
 
 // Models
 import { User } from '@prisma/client';
@@ -67,6 +68,7 @@ export class AuthService {
 
     return this.sanitizeUserJwt(user);
   }
+
   async updatePassword(email: string, password: string) {
     try {
       const hashedPassowrd = await bcrypt.hash(password, 10);
