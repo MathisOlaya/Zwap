@@ -18,4 +18,4 @@ Zwap is an online marketplace where users can sell and promote their products th
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/your-username/zwap.git
+   git clone https://github.com/MathisOlaya/zwap.git
