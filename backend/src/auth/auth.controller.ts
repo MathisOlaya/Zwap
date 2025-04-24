@@ -65,7 +65,12 @@ export class AuthController {
       id: user.id,
       email: user.email,
     });
-    this.cookiesService.store(res, 'access_token', token);
+    this.cookiesService.store(res, 'access_toen', token);
+  }
+
+  @Get('logout')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    await this.cookiesService.clear(req, res, 'access_token');
   }
 
   @Get('reset-password')
