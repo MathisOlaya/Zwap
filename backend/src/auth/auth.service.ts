@@ -84,6 +84,24 @@ export class AuthService {
     }
   }
 
+  catchJwtError(
+    err: Error,
+    customExpirationMessage?: string,
+    customErrorMessage?: string,
+  ) {
+    if (err.name === 'TokenExpiredError') {
+      throw new HttpException(
+        customExpirationMessage || "Le jeton d'accès a expiré",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (err.name === 'JsonWebTokenError') {
+      throw new HttpException(
+        customErrorMessage || "Le jeton d'accès n'est pas valide",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
   sanitizeUser(user: User) {
     // Remove password from USER
     const { password, ...sanitizedUser } = user;

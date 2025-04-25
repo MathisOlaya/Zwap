@@ -107,6 +107,11 @@ export class AuthController {
           HttpStatus.UNAUTHORIZED,
         );
       }
+      this.authService.catchJwtError(
+        err,
+        'Le lien de réinitialisation a expiré.',
+        "Le lien de réinitialisation n'est pas valide",
+      );
       throw new HttpException(
         'Erreur lors de la modification du mot de passe',
         HttpStatus.INTERNAL_SERVER_ERROR,
