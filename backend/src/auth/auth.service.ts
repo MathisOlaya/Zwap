@@ -84,6 +84,35 @@ export class AuthService {
     }
   }
 
+  async deleteUser(email: string) {
+    try {
+      await this.prisma.user.delete({ where: { email } });
+    } catch {
+      throw new HttpException(
+        "Erreur lors de la suppresion de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  catchJwtError(
+    err: Error,
+    customExpirationMessage?: string,
+    customErrorMessage?: string,
+  ) {
+    if (err.name === 'TokenExpiredError') {
+      throw new HttpException(
+        customExpirationMessage || "Le jeton d'accès a expiré",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (err.name === 'JsonWebTokenError') {
+      throw new HttpException(
+        customErrorMessage || "Le jeton d'accès n'est pas valide",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
   sanitizeUser(user: User) {
     // Remove password from USER
     const { password, ...sanitizedUser } = user;

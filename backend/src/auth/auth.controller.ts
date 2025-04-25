@@ -9,6 +9,7 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  Delete,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -65,12 +66,25 @@ export class AuthController {
       id: user.id,
       email: user.email,
     });
-    this.cookiesService.store(res, 'access_toen', token);
+    this.cookiesService.store(res, 'access_token', token);
   }
 
   @Get('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     await this.cookiesService.clear(req, res, 'access_token');
+  }
+
+  @Delete('delete')
+  @HttpCode(204)
+  async delete(@Req() req: Request) {
+    try {
+      const jwt = await this.jwtService.verify(req.cookies.access_token);
+
+      // Delete user
+      await this.authService.deleteUser(jwt.email);
+    } catch (err) {
+      this.authService.catchJwtError(err);
+    }
   }
 
   @Get('reset-password')
@@ -95,18 +109,11 @@ export class AuthController {
 
       await this.authService.updatePassword(payload.email, creds.password);
     } catch (err) {
-      if (err.name === 'TokenExpiredError') {
-        throw new HttpException(
-          'Le lien de réinitialisation a expiré.',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      if (err.name === 'JsonWebTokenError') {
-        throw new HttpException(
-          "Le lien de réinitialisation n'est pas valide",
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
+      this.authService.catchJwtError(
+        err,
+        'Le lien de réinitialisation a expiré.',
+        "Le lien de réinitialisation n'est pas valide",
+      );
       throw new HttpException(
         'Erreur lors de la modification du mot de passe',
         HttpStatus.INTERNAL_SERVER_ERROR,
