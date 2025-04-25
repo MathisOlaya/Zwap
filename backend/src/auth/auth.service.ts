@@ -84,6 +84,17 @@ export class AuthService {
     }
   }
 
+  async deleteUser(email: string) {
+    try {
+      await this.prisma.user.delete({ where: { email } });
+    } catch {
+      throw new HttpException(
+        "Erreur lors de la suppresion de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   catchJwtError(
     err: Error,
     customExpirationMessage?: string,
