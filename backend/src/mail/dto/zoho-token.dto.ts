@@ -4,7 +4,7 @@ import { IsEmail, IsNumber, IsString, MinLength } from 'class-validator';
 import { TokenType } from '@prisma/client';
 
 export class ZohoTokenDto {
-  id: number;
+  id: string;
   type: TokenType;
   key: string;
   expiresIn: bigint;

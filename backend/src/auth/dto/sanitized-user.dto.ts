@@ -1,8 +1,8 @@
-import { IsEmail, IsNumber, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class SanitizedUserDto {
-  @IsNumber()
-  id: Number;
+  @IsUUID()
+  id: string;
 
   @IsString()
   firstname: string;
