@@ -1,8 +1,8 @@
-import { IsEmail, IsNumber, IsString } from 'class-validator';
+import { IsEmail, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class SanitizedUserJwtDto {
-  @IsNumber()
-  id: number;
+  @IsUUID()
+  id: string;
 
   @IsString()
   @IsEmail()
