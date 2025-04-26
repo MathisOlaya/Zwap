@@ -33,6 +33,15 @@ model Token{
   expiresIn BigInt
 }
 
+//Articles
+model Article {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  description String
+  price Int
+  clickCount Int @default(0)
+}
+
 enum TokenType{
   Zoho
 }
