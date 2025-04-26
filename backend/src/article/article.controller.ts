@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -16,6 +17,7 @@ import { ArticleCreationDto } from './dto/article-creation.dto';
 
 // Guards
 import { JwtAuthGuard } from 'src/auth/jwt-auth/jwt-auth.guard';
+import { User } from 'src/auth/decorators/user.decorator';
 
 @Controller('article')
 export class ArticleController {
@@ -26,6 +28,7 @@ export class ArticleController {
   async addArticle(
     @Body() article: ArticleCreationDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
+    @User('id') userId: number,
   ) {
     if (!files.length) {
       throw new HttpException(
