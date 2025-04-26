@@ -6,9 +6,10 @@ import { PrismaService } from './prisma/prisma.service';
 import { CookiesService } from './cookies/cookies.service';
 import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
+import { ArticleModule } from './article/article.module';
 
 @Module({
-  imports: [AuthModule, MailModule],
+  imports: [AuthModule, MailModule, ArticleModule],
   controllers: [AppController],
   providers: [AppService, PrismaService, CookiesService],
 })
