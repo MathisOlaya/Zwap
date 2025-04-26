@@ -33,5 +33,15 @@ export class ArticleController {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    //Are they pictures ?
+    for (const file of files) {
+      if (!file.mimetype.startsWith('image/')) {
+        throw new HttpException(
+          'Seuls les images sont autorisés',
+          HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+        );
+      }
+    }
   }
 }
