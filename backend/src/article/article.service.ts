@@ -66,6 +66,20 @@ export class ArticleService {
 
       // Wait for all images to be uploaded
       await Promise.all(upload);
+
+      // Create article
+      const newArticle = await this.prismaService.article.create({
+        data: {
+          name: article.name,
+          description: article.description,
+          price: parseFloat(article.price.toString()),
+          coverImg: imagesUrl[0],
+          userId,
+        },
+      });
+
+      // Cover image is already save in article table
+      imagesUrl.shift();
       });
   }
 }
