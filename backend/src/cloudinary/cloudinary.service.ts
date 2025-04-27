@@ -56,4 +56,27 @@ export class CloudinaryService {
       );
     }
   }
+
+  async destroyAllImagesFromFolder(folder: string): Promise<void> {
+    try {
+      // Get all pictures from articles by user
+      const results = await cloudinary.api.resources({
+        type: 'upload',
+        prefix: folder,
+      });
+
+      // Delete them
+      for (const resource of results.resources) {
+        const publicId = resource.public_id;
+
+        // Destroy
+        await cloudinary.uploader.destroy(publicId);
+      }
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la suppression des images',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
