@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsString,
   Max,
+  MaxLength,
   Min,
   MinLength,
 } from 'class-validator';
@@ -14,6 +15,10 @@ export class ArticleCreationDto {
   @IsString({ message: "Le nom de l'article n'est pas valide" })
   @MinLength(3, {
     message: 'Le nom de votre article doit contenir au minimum 3 caractères',
+  })
+  @MaxLength(100, {
+    message:
+      'Le nom de votre article ne peut pas dépasser plus de 100 caractères',
   })
   @IsNotEmpty({ message: "Merci de fournir un nom à l'article" })
   name: string;
