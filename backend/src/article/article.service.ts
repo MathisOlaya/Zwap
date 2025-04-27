@@ -80,6 +80,22 @@ export class ArticleService {
 
       // Cover image is already save in article table
       imagesUrl.shift();
+
+      // Store all images URL to database
+      imagesUrl.forEach(async (imageUrl) => {
+        await this.prismaService.articleImages.create({
+          data: {
+            image: imageUrl,
+            articleId: newArticle.id,
+          },
+        });
       });
+    } catch (err) {
+      console.error(err);
+      throw new HttpException(
+        "Erreur lors de la création de l'article",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
