@@ -45,5 +45,27 @@ export class ArticleService {
     images: Array<Express.Multer.File>,
     userId: string,
   ) {
+    // Folder where images will be upload
+    const folder = `articles/${userId}`;
+
+    // Array for each image's url
+    const imagesUrl: Array<string> = [];
+
+    try {
+      // Upload all images to Cloudinary
+      const upload = images.map(async (image) => {
+        // Upload
+        const url: string = await this.cloudinaryService.uploadImage(
+          image,
+          folder,
+        );
+
+        // Store it
+        imagesUrl.push(url);
+      });
+
+      // Wait for all images to be uploaded
+      await Promise.all(upload);
+      });
   }
 }
