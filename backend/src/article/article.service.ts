@@ -39,4 +39,11 @@ export class ArticleService {
       }
     }
   }
+
+  async create(
+    article: ArticleCreationDto,
+    images: Array<Express.Multer.File>,
+    userId: string,
+  ) {
+  }
 }
