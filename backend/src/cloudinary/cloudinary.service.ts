@@ -10,7 +10,10 @@ export class CloudinaryService {
     CloudinaryConfig();
   }
 
-  async uploadImage(file: Express.Multer.File, folder: string) {
+  async uploadImage(
+    file: Express.Multer.File,
+    folder: string,
+  ): Promise<string> {
     try {
       return new Promise((resolve, reject) => {
         const upload = cloudinary.uploader.upload_stream(
@@ -28,7 +31,16 @@ export class CloudinaryService {
                 ),
               );
             } else {
-              resolve(result?.secure_url);
+              if (result?.secure_url) {
+                resolve(result.secure_url);
+              } else {
+                reject(
+                  new HttpException(
+                    "L'URL sécurisée de l'image est introuvable.",
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                  ),
+                );
+              }
             }
           },
         );
