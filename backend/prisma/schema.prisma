@@ -24,6 +24,7 @@ model User {
   profile_picture String?
   rate Int @default(0)
   articles Article[]
+  articles Article[] 
   createdAt DateTime @default(now())
 }
 
@@ -34,8 +35,11 @@ model Article {
   description String
   price Int
   clickCount Int @default(0)
+  coverImg String
+  images ArticleImages[]
   userId String @db.Uuid
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
 model ArticleImages {
   id String @id @default(uuid()) @db.Uuid
