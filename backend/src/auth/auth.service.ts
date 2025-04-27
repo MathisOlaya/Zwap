@@ -19,10 +19,14 @@ import { Response } from 'express';
 // Models
 import { User } from '@prisma/client';
 import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudinary: CloudinaryService,
+  ) {}
 
   // Validate User Creds
   async validateUser(userInput: LoginUserDto) {
@@ -84,10 +88,14 @@ export class AuthService {
     }
   }
 
-  async deleteUser(email: string) {
+  async deleteUser(id: string) {
     try {
-      await this.prisma.user.delete({ where: { email } });
-    } catch {
+      // Deleting all articles images from CLOUDINARY
+      await this.cloudinary.destroyAllImagesFromFolder(`articles/${id}`);
+
+      // Delete user
+      await this.prisma.user.delete({ where: { id } });
+    } catch (err) {
       throw new HttpException(
         "Erreur lors de la suppresion de l'utilisateur",
         HttpStatus.INTERNAL_SERVER_ERROR,

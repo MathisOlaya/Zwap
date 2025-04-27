@@ -10,7 +10,10 @@ export class CloudinaryService {
     CloudinaryConfig();
   }
 
-  async uploadImage(file: Express.Multer.File, folder: string) {
+  async uploadImage(
+    file: Express.Multer.File,
+    folder: string,
+  ): Promise<string> {
     try {
       return new Promise((resolve, reject) => {
         const upload = cloudinary.uploader.upload_stream(
@@ -28,7 +31,16 @@ export class CloudinaryService {
                 ),
               );
             } else {
-              resolve(result?.secure_url);
+              if (result?.secure_url) {
+                resolve(result.secure_url);
+              } else {
+                reject(
+                  new HttpException(
+                    "L'URL sécurisée de l'image est introuvable.",
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                  ),
+                );
+              }
             }
           },
         );
@@ -40,6 +52,29 @@ export class CloudinaryService {
       console.error(err);
       throw new HttpException(
         'Erreur lors le sauvegarde des images.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async destroyAllImagesFromFolder(folder: string): Promise<void> {
+    try {
+      // Get all pictures from articles by user
+      const results = await cloudinary.api.resources({
+        type: 'upload',
+        prefix: folder,
+      });
+
+      // Delete them
+      for (const resource of results.resources) {
+        const publicId = resource.public_id;
+
+        // Destroy
+        await cloudinary.uploader.destroy(publicId);
+      }
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la suppression des images',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

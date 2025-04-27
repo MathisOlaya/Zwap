@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CookiesService } from 'src/cookies/cookies.service';
 import { MailModule } from 'src/mail/mail.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MailModule } from 'src/mail/mail.module';
       signOptions: { expiresIn: process.env.JWT_EXPIRES },
     }),
     forwardRef(() => MailModule),
+    CloudinaryModule,
   ],
   providers: [AuthService, PrismaService, CookiesService],
   controllers: [AuthController],

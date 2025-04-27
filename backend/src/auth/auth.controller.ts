@@ -10,6 +10,7 @@ import {
   HttpException,
   HttpStatus,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -25,6 +26,8 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthService } from './auth.service';
 import { CookiesService } from 'src/cookies/cookies.service';
 import { MailService } from 'src/mail/mail.service';
+import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
+import { User } from './decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -76,14 +79,26 @@ export class AuthController {
 
   @Delete('delete')
   @HttpCode(204)
-  async delete(@Req() req: Request) {
+  @UseGuards(JwtAuthGuard)
+  async delete(
+    @Req() req: Request,
+    @Res() res: Response,
+    @User('id') id: string,
+  ) {
     try {
-      const jwt = await this.jwtService.verify(req.cookies.access_token);
-
       // Delete user
-      await this.authService.deleteUser(jwt.email);
+      await this.authService.deleteUser(id);
+
+      // Remove cookie
+      await this.cookiesService.clear(req, res, 'access_token');
     } catch (err) {
       this.authService.catchJwtError(err);
+
+      // Error
+      throw new HttpException(
+        "Erreur lors de la suppression de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
