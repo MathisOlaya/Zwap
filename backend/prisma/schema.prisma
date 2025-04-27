@@ -23,14 +23,8 @@ model User {
   phoneNumber String @unique
   profile_picture String?
   rate Int @default(0)
+  articles Article[]
   createdAt DateTime @default(now())
-}
-
-model Token{
-  id  String @id @default(uuid()) @db.Uuid
-  type TokenType @unique
-  key String
-  expiresIn BigInt
 }
 
 //Articles
@@ -40,7 +34,18 @@ model Article {
   description String
   price Int
   clickCount Int @default(0)
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id])
 }
+
+model Token{
+  id  String @id @default(uuid()) @db.Uuid
+  type TokenType @unique
+  key String
+  expiresIn BigInt
+}
+
+
 
 enum TokenType{
   Zoho
