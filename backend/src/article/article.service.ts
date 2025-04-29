@@ -98,4 +98,19 @@ export class ArticleService {
       );
     }
   }
+
+  async getArticlesByUser(id: string) {
+    try {
+      // Fetch database
+      return await this.prismaService.user.findFirst({
+        where: { id },
+        select: { articles: true },
+      });
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la connexion au serveur',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
