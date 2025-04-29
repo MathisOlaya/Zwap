@@ -2,14 +2,12 @@
 import {
   Body,
   Controller,
-  HttpException,
-  HttpStatus,
   Post,
-  Req,
+  Get,
   UploadedFiles,
-  UseFilters,
   UseGuards,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
@@ -26,6 +24,7 @@ import { ArticleService } from './article.service';
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
+
   //Article creation
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -40,5 +39,12 @@ export class ArticleController {
 
     // Create
     await this.articleService.create(article, files, userId);
+  }
+
+  //Articles By USER
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getArticlesByUser(@User('id') id: string) {
+    return await this.articleService.getArticlesByUser(id);
   }
 }
