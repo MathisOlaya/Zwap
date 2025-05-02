@@ -38,4 +38,8 @@ export class StripeService {
       name: firstname,
     });
   }
+
+  async deleteUser(id: string) {
+    await this.stripe.customers.del(id);
+  }
 }
