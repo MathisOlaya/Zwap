@@ -15,17 +15,20 @@ import { RegisterUserDto } from './dto/register.dto';
 // Dependencies
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
+import Stripe from 'stripe';
 
 // Models
 import { User } from '@prisma/client';
 import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { StripeService } from 'src/stripe/stripe.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cloudinary: CloudinaryService,
+    private readonly stripe: StripeService,
   ) {}
 
   // Validate User Creds
@@ -70,6 +73,15 @@ export class AuthService {
       data: { ...userInput, password: password },
     });
 
+    // Create stripe account user
+    const customer: Stripe.Customer = await this.stripe.createUser(user);
+
+    // Store stripe id to user database
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { stripe_customerId: customer.id },
+    });
+
     return this.sanitizeUserJwt(user);
   }
 
@@ -92,6 +104,20 @@ export class AuthService {
     try {
       // Deleting all articles images from CLOUDINARY
       await this.cloudinary.destroyAllImagesFromFolder(`articles/${id}`);
+
+      // Deleting stripe account
+      const user = await this.prisma.user.findFirstOrThrow({
+        where: { id },
+        select: { stripe_customerId: true },
+      });
+
+      if (!user.stripe_customerId) {
+        throw new HttpException(
+          'Erreur lors de la suppresion du compte',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+      await this.stripe.deleteUser(user.stripe_customerId);
 
       // Delete user
       await this.prisma.user.delete({ where: { id } });

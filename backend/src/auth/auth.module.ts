@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CookiesService } from 'src/cookies/cookies.service';
 import { MailModule } from 'src/mail/mail.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { StripeModule } from 'src/stripe/stripe.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
     }),
     forwardRef(() => MailModule),
     CloudinaryModule,
+    StripeModule,
   ],
   providers: [AuthService, PrismaService, CookiesService],
   controllers: [AuthController],
