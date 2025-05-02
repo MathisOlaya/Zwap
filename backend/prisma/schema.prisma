@@ -22,6 +22,7 @@ model User {
   password String
   phoneNumber String @unique
   profile_picture String?
+  stripe_customerId String?
   rate Int @default(0)
   articles Article[] 
   createdAt DateTime @default(now())
