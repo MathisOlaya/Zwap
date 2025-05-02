@@ -15,4 +15,17 @@ export class StripeService {
   constructor() {
     this.stripe = StripeConfig();
   }
+
+  async createUser(User: User): Promise<Stripe.Customer> {
+    const customer: Stripe.Customer = await this.stripe.customers.create({
+      name: User.firstname,
+      email: User.email,
+      metadata: {
+        user_id: User.id,
+      },
+    });
+
+    return customer;
+  }
+
 }
