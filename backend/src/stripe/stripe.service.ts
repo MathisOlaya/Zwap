@@ -28,4 +28,14 @@ export class StripeService {
     return customer;
   }
 
+  async updateUser(
+    id: string,
+    email: string,
+    firstname: string,
+  ): Promise<void> {
+    await this.stripe.customers.update(id, {
+      email,
+      name: firstname,
+    });
+  }
 }
