@@ -1,33 +1,33 @@
 import {
   Body,
   Controller,
-  Post,
-  Res,
-  Req,
-  HttpCode,
+  Delete,
   Get,
-  Param,
+  HttpCode,
   HttpException,
   HttpStatus,
-  Delete,
+  Param,
+  Post,
+  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { Request, Response } from 'express';
 
 // DTOs
 import { LoginUserDto } from './dto/login.dto';
-import { RegisterUserDto } from './dto/register.dto';
-import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
 import { ResetPasswordMailDto } from './dto/password-reseting-request.dto';
+import { RegisterUserDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SanitizedUserJwtDto } from './dto/sanitized-user-jwt.dto';
 
 // Services
-import { AuthService } from './auth.service';
 import { CookiesService } from 'src/cookies/cookies.service';
 import { MailService } from 'src/mail/mail.service';
-import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
+import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
+import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -53,6 +53,8 @@ export class AuthController {
 
     // Save it into a secured cookie
     this.cookiesService.store(res, 'access_token', token);
+
+    return { user };
   }
 
   @Post('register')
