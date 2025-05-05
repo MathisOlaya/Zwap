@@ -16,18 +16,32 @@ import { font, gapV, height, width } from "@/utils/responsive";
 // Service
 import AuthService from "@/services/AuthService";
 
+// Context
+import { useAuth } from "@/context/AuthContext";
+
 export default function LoginScreen() {
   // Inputs value
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Handle login
+  const { signIn } = useAuth();
+
   const login = async () => {
+    // User creds
     const user = {
       email,
       password,
     };
+    try {
+      const response = await AuthService.loginUser(user);
 
-    await AuthService.loginUser(user);
+      if (response) {
+    } catch (err) {
+      if (err instanceof Error) {
+        });
+      }
+    }
   };
 
   return (
