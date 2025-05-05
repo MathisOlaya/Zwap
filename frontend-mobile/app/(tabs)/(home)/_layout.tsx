@@ -6,7 +6,7 @@ export default function RootLayout() {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
-    return <Redirect href="/" />;
+    return <Redirect href="/register" />;
   }
 
   return (
@@ -15,7 +15,7 @@ export default function RootLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="(home)" />
+      <Stack.Screen name="home" />
     </Stack>
   );
 }
