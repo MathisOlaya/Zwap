@@ -1,5 +1,5 @@
 // Dependencies
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 
 // Type
 import { UserLoginInput } from "@/types/user";
@@ -20,7 +20,11 @@ class AuthService {
   static async loginUser(User: UserLoginInput) {
     try {
       const response = await apiClient.post("/login", User);
-      console.log(await response.status);
+
+      if (response.status === HttpStatusCode.Ok) {
+        // Ok
+        return response.data;
+      }
     } catch (err) {
       //console.log(err.response.data.message);
     }
