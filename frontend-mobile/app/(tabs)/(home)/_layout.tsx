@@ -1,13 +1,12 @@
 import { Redirect, Stack } from "expo-router";
 
-// Context
 import { useAuth } from "@/context/AuthContext";
 
-export default function AuthLayout() {
+export default function RootLayout() {
   const { isAuthenticated } = useAuth();
 
-  if (isAuthenticated) {
-    return <Redirect href="/home" />;
+  if (!isAuthenticated) {
+    return <Redirect href="/register" />;
   }
 
   return (
@@ -16,8 +15,7 @@ export default function AuthLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="index" />
-      <Stack.Screen name="register" />
+      <Stack.Screen name="home" />
     </Stack>
   );
 }
