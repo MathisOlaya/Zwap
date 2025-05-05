@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // Components
 import Input from "@/components/Input";
+import Toast from "react-native-toast-message";
 
 // Colors
 import colors from "@/constants/Color";
@@ -37,8 +38,15 @@ export default function LoginScreen() {
       const response = await AuthService.loginUser(user);
 
       if (response) {
+        // Log in
+        signIn(response.user.id);
+      }
     } catch (err) {
       if (err instanceof Error) {
+        Toast.show({
+          type: "error",
+          text1: "Oupsss...",
+          text2: err.message,
         });
       }
     }
@@ -46,6 +54,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Toast />
       <View style={styles.captionContainer}>
         <Image style={styles.image} source={require("../../assets/images/logo.png")} />
         <Text style={styles.caption}>Zwap it. Love it.</Text>
