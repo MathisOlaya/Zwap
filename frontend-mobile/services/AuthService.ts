@@ -26,7 +26,15 @@ class AuthService {
         return response.data;
       }
     } catch (err) {
-      //console.log(err.response.data.message);
+      if (axios.isAxiosError(err)) {
+        // Axios error from backend
+        const message = Array.isArray(err.response?.data.message)
+          ? err.response?.data.message[0] || "Une erreur est survenue"
+          : err.response?.data.message || "Une erreur est survenue";
+
+        throw new Error(message);
+      }
+      throw new Error("Une erreur est survenue");
     }
   }
 }
