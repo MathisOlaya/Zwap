@@ -32,7 +32,9 @@ export class AuthService {
   async validateUser(userInput: LoginUserDto) {
     const { email, password } = userInput;
 
-    const user = await this.prisma.user.findFirst({ where: { email } });
+    const user = await this.prisma.user.findFirst({
+      where: { email: email.toLowerCase() },
+    });
 
     // None
     if (!user) {
@@ -64,6 +66,9 @@ export class AuthService {
 
     // Hash password using Bcrypt
     const password: string = await bcrypt.hash(userInput.password, 10);
+
+    // Lower case email only
+    userInput.email = userInput.email.toLowerCase();
 
     // Store user into DB
     const user: User = await this.prisma.user.create({
