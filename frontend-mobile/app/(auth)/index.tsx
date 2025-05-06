@@ -1,4 +1,3 @@
-import { Link } from "expo-router";
 import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,6 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // Components
 import Input from "@/components/Input";
 import Toast from "react-native-toast-message";
+import Caption from "@/components/Secondary/Caption";
+import Link from "@/components/Link";
 
 // Colors
 import colors from "@/constants/Color";
@@ -77,9 +78,9 @@ export default function LoginScreen() {
       <Caption />
       <View style={styles.action}>
         <View style={styles.inputContainer}>
-          <Input label="Email" placeholder="Taper ici" onChangeText={setEmail} />
+          <Input label="Email" placeholder="joe@example.com" onChangeText={setEmail} />
           <View style={styles.password}>
-            <Input label="Mot de passe" placeholder="Taper ici" onChangeText={setPassword} secureTextEntry={true} />
+            <Input label="Mot de passe" placeholder="**************" onChangeText={setPassword} secureTextEntry={true} />
             <Link href="/register" style={{ paddingLeft: width(8) }}>
               Mot de passe oublié ? Réinitialiser ici
             </Link>
@@ -114,9 +115,5 @@ const styles = StyleSheet.create({
   loginButtonContainer: {
     alignItems: "center",
     gap: gapV(8),
-  },
-  loginText: {
-    color: colors.grey400,
-    fontSize: font(12),
   },
 });
