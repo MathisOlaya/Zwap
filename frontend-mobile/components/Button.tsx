@@ -7,11 +7,16 @@ import { font, height, width } from "@/utils/responsive";
 type PropsButton = {
   text: string;
   onClick: () => void;
+  disabled?: boolean;
 };
 
-const Button = ({ text, onClick }: PropsButton) => {
+const Button = ({ text, onClick, disabled }: PropsButton) => {
   return (
-    <Pressable onPress={onClick} style={({ pressed }) => [styles.button, pressed && { opacity: 0.8 }]}>
+    <Pressable
+      onPress={onClick}
+      style={({ pressed }) => [styles.button, pressed && { opacity: 0.8 }]}
+      disabled={disabled ? disabled : false}
+    >
       <Text style={styles.text}>{text}</Text>
     </Pressable>
   );
