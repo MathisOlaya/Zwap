@@ -29,6 +29,13 @@ export default function LoginScreen() {
   const { signIn } = useAuth();
 
   const login = async () => {
+    if (!email || !password) {
+      return Toast.show({
+        type: "error",
+        text1: "Oupsss...",
+        text2: "Merci de remplir tous les champs",
+      });
+    }
     // User creds
     const user = {
       email,
