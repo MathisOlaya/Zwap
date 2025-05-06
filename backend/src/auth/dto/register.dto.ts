@@ -32,7 +32,7 @@ export class RegisterUserDto {
       minUppercase: 1,
       minNumbers: 0,
       minLowercase: 0,
-      minSymbols: 1,
+      minSymbols: 0,
     },
     { message: 'Le mot de passe ne respècte pas les critères.' },
   )
