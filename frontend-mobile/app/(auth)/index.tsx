@@ -25,6 +25,9 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Button
+  const [disabled, setDisabled] = useState(false);
+
   // Handle login
   const { signIn } = useAuth();
 
@@ -42,12 +45,18 @@ export default function LoginScreen() {
       password,
     };
     try {
+      // Disable button request
+      setDisabled(true);
+
       const response = await AuthService.loginUser(user);
 
       if (response) {
         // Log in
         signIn(response.user.id);
       }
+
+      // Enable button
+      setDisabled(false);
     } catch (err) {
       if (err instanceof Error) {
         Toast.show({
@@ -56,6 +65,9 @@ export default function LoginScreen() {
           text2: err.message,
         });
       }
+
+      // Enable button
+      setDisabled(false);
     }
   };
 
@@ -81,6 +93,7 @@ export default function LoginScreen() {
           <Link href="/register" style={styles.loginText}>
             Pas de compte ? En créer un
           </Link>
+          <Button text="Se connecter" onClick={login} disabled={disabled} />
         </View>
       </View>
     </SafeAreaView>
