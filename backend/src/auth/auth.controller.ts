@@ -72,6 +72,8 @@ export class AuthController {
       email: user.email,
     });
     this.cookiesService.store(res, 'access_token', token);
+
+    return { user };
   }
 
   @Get('logout')

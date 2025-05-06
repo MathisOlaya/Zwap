@@ -1,4 +1,3 @@
-import { Link } from "expo-router";
 import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,6 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // Components
 import Input from "@/components/Input";
 import Toast from "react-native-toast-message";
+import Caption from "@/components/Secondary/Caption";
+import Link from "@/components/Link";
 
 // Colors
 import colors from "@/constants/Color";
@@ -25,22 +26,38 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Button
+  const [disabled, setDisabled] = useState(false);
+
   // Handle login
   const { signIn } = useAuth();
 
   const login = async () => {
+    if (!email || !password) {
+      return Toast.show({
+        type: "error",
+        text1: "Oupsss...",
+        text2: "Merci de remplir tous les champs",
+      });
+    }
     // User creds
     const user = {
       email,
       password,
     };
     try {
+      // Disable button request
+      setDisabled(true);
+
       const response = await AuthService.loginUser(user);
 
       if (response) {
         // Log in
         signIn(response.user.id);
       }
+
+      // Enable button
+      setDisabled(false);
     } catch (err) {
       if (err instanceof Error) {
         Toast.show({
@@ -49,31 +66,29 @@ export default function LoginScreen() {
           text2: err.message,
         });
       }
+
+      // Enable button
+      setDisabled(false);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Toast />
-      <View style={styles.captionContainer}>
-        <Image style={styles.image} source={require("../../assets/images/logo.png")} />
-        <Text style={styles.caption}>Zwap it. Love it.</Text>
-      </View>
+      <Caption />
       <View style={styles.action}>
         <View style={styles.inputContainer}>
-          <Input label="Email" placeholder="Taper ici" onChangeText={setEmail} />
+          <Input label="Email" placeholder="joe@example.com" onChangeText={setEmail} />
           <View style={styles.password}>
-            <Input label="Mot de passe" placeholder="Taper ici" onChangeText={setPassword} secureTextEntry={true} />
-            <Link href="/register" style={styles.passwordLink}>
+            <Input label="Mot de passe" placeholder="**************" onChangeText={setPassword} secureTextEntry={true} />
+            <Link href="/register" style={{ paddingLeft: width(8) }}>
               Mot de passe oublié ? Réinitialiser ici
             </Link>
           </View>
         </View>
         <View style={styles.loginButtonContainer}>
-          <Button text="Se connecter" onClick={login} />
-          <Link href="/register" style={styles.loginText}>
-            Pas de compte ? En créer un
-          </Link>
+          <Button text="Se connecter" onClick={login} disabled={disabled} />
+          <Link href="/register">Pas de compte ? En créer un</Link>
         </View>
       </View>
     </SafeAreaView>
@@ -88,24 +103,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
   },
-  captionContainer: {
-    display: "flex",
-    alignItems: "center",
-    paddingVertical: height(80),
-    gap: gapV(10),
-  },
-  image: {
-    width: width(195),
-    height: height(75),
-    objectFit: "contain",
-  },
   action: {
     gap: gapV(24),
-  },
-  caption: {
-    fontFamily: "Poppins-LightItalic",
-    fontSize: font(16),
-    color: colors.grey300,
   },
   inputContainer: {
     gap: gapV(18),
@@ -113,18 +112,8 @@ const styles = StyleSheet.create({
   password: {
     gap: gapV(6),
   },
-  passwordLink: {
-    fontFamily: "Poppins-Regular",
-    color: colors.grey400,
-    paddingLeft: width(8),
-    fontSize: font(12),
-  },
   loginButtonContainer: {
     alignItems: "center",
     gap: gapV(8),
-  },
-  loginText: {
-    color: colors.grey400,
-    fontSize: font(12),
   },
 });

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardTypeOptions, StyleSheet, Text, TextInput, View } from "react-native";
 
 //Responsive
 import { font, gapH, gapV, height, width } from "@/utils/responsive";
@@ -13,6 +13,7 @@ type InputProps = {
   placeholder: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
+  type?: KeyboardTypeOptions;
 };
 
 const Input = (Props: InputProps) => {
@@ -26,6 +27,7 @@ const Input = (Props: InputProps) => {
         placeholder={Props.placeholder}
         onChangeText={Props.onChangeText}
         secureTextEntry={Props.secureTextEntry ? Props.secureTextEntry : false}
+        keyboardType={Props.type ? Props.type : "default"}
       />
     </View>
   );
