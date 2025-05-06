@@ -74,10 +74,7 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Toast />
-      <View style={styles.captionContainer}>
-        <Image style={styles.image} source={require("../../assets/images/logo.png")} />
-        <Text style={styles.caption}>Zwap it. Love it.</Text>
-      </View>
+      <Caption />
       <View style={styles.action}>
         <View style={styles.inputContainer}>
           <Input label="Email" placeholder="Taper ici" onChangeText={setEmail} />
@@ -108,36 +105,14 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
   },
-  captionContainer: {
-    display: "flex",
-    alignItems: "center",
-    paddingVertical: height(80),
-    gap: gapV(10),
-  },
-  image: {
-    width: width(195),
-    height: height(75),
-    objectFit: "contain",
-  },
   action: {
     gap: gapV(24),
-  },
-  caption: {
-    fontFamily: "Poppins-LightItalic",
-    fontSize: font(16),
-    color: colors.grey300,
   },
   inputContainer: {
     gap: gapV(18),
   },
   password: {
     gap: gapV(6),
-  },
-  passwordLink: {
-    fontFamily: "Poppins-Regular",
-    color: colors.grey400,
-    paddingLeft: width(8),
-    fontSize: font(12),
   },
   loginButtonContainer: {
     alignItems: "center",
