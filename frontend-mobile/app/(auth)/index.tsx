@@ -80,17 +80,14 @@ export default function LoginScreen() {
           <Input label="Email" placeholder="Taper ici" onChangeText={setEmail} />
           <View style={styles.password}>
             <Input label="Mot de passe" placeholder="Taper ici" onChangeText={setPassword} secureTextEntry={true} />
-            <Link href="/register" style={styles.passwordLink}>
+            <Link href="/register" style={{ paddingLeft: width(8) }}>
               Mot de passe oublié ? Réinitialiser ici
             </Link>
           </View>
         </View>
         <View style={styles.loginButtonContainer}>
-          <Button text="Se connecter" onClick={login} />
-          <Link href="/register" style={styles.loginText}>
-            Pas de compte ? En créer un
-          </Link>
           <Button text="Se connecter" onClick={login} disabled={disabled} />
+          <Link href="/register">Pas de compte ? En créer un</Link>
         </View>
       </View>
     </SafeAreaView>
