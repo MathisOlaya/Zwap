@@ -5,6 +5,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { ArticleCreationDto } from './dto/article-creation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { isUUID } from 'class-validator';
+import { Category } from '@prisma/client';
 
 @Injectable()
 export class ArticleService {
@@ -92,7 +94,6 @@ export class ArticleService {
         });
       });
     } catch (err) {
-      console.error(err);
       throw new HttpException(
         "Erreur lors de la création de l'article",
         HttpStatus.INTERNAL_SERVER_ERROR,
