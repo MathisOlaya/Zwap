@@ -114,4 +114,19 @@ export class ArticleService {
       );
     }
   }
+  async isCategoryValid(id: string): Promise<Boolean> {
+    if (!isUUID(id)) return false;
+
+    // Checking category
+    const category = await this.prismaService.category.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (category) {
+      return true;
+    }
+    return false;
+  }
 }
