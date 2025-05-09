@@ -122,7 +122,7 @@ export class ArticleService {
   ) {
     try {
       const update = await this.prismaService.userCategoryScore.upsert({
-        where: { categoryId, userId },
+        where: { userId_categoryId: { userId, categoryId } },
         update: { score: { increment: incScore } },
         create: {
           userId,
