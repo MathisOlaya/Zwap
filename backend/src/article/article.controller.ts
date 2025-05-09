@@ -8,6 +8,10 @@ import {
   UseGuards,
   UseInterceptors,
   Req,
+  HttpException,
+  HttpStatus,
+  Put,
+  Param,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
@@ -20,6 +24,8 @@ import { User } from 'src/auth/decorators/user.decorator';
 
 // Services
 import { ArticleService } from './article.service';
+import { ArticleRegisterClick } from './dto/article-register-click.dto';
+import { isUUID } from 'class-validator';
 
 @Controller('articles')
 export class ArticleController {
@@ -54,5 +60,28 @@ export class ArticleController {
   @Get()
   async getArticlesByUser(@User('id') id: string) {
     return await this.articleService.getArticlesByUser(id);
+  }
+
+  // Update user category score on click
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/click')
+  async registerClick(
+    @Param('id') articleId: string,
+    @User('id') userId: string,
+  ) {
+    // Is Valid ArticleID
+    if (!isUUID(articleId)) {
+      throw new HttpException(
+        "L'article sélectionné n'est pas valide",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Get Category id
+    const categoryId =
+      await this.articleService.getCategoryByArticleID(articleId);
+
+    // Update
+    await this.articleService.updateUserCategoryScore(categoryId, userId, 1);
   }
 }

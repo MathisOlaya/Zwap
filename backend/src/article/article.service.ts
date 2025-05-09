@@ -5,6 +5,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { ArticleCreationDto } from './dto/article-creation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { isUUID } from 'class-validator';
+import { Category } from '@prisma/client';
 
 @Injectable()
 export class ArticleService {
@@ -92,7 +94,6 @@ export class ArticleService {
         });
       });
     } catch (err) {
-      console.error(err);
       throw new HttpException(
         "Erreur lors de la création de l'article",
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -114,6 +115,56 @@ export class ArticleService {
       );
     }
   }
+  async updateUserCategoryScore(
+    categoryId: string,
+    userId: string,
+    incScore: number,
+  ) {
+    try {
+      const update = await this.prismaService.userCategoryScore.upsert({
+        where: { categoryId, userId },
+        update: { score: { increment: incScore } },
+        create: {
+          userId,
+          categoryId,
+          score: incScore,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      throw new HttpException(
+        'Erreur lors de la mise à jour du score',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getCategoryByArticleID(articleId: string): Promise<string> {
+    try {
+      const category = await this.prismaService.article.findFirst({
+        where: { id: articleId },
+        select: { categoryId: true },
+      });
+
+      if (!category) {
+        throw new HttpException(
+          'Aucune catégorie trouvée pour cette article',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return category.categoryId;
+    } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+      throw new HttpException(
+        'Erreur lors la récupération de la catégorie',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async isCategoryValid(id: string): Promise<Boolean> {
     if (!isUUID(id)) return false;
 
