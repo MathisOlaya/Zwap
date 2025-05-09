@@ -114,6 +114,30 @@ export class ArticleService {
       );
     }
   }
+  async updateUserCategoryScore(
+    categoryId: string,
+    userId: string,
+    incScore: number,
+  ) {
+    try {
+      const update = await this.prismaService.userCategoryScore.upsert({
+        where: { categoryId, userId },
+        update: { score: { increment: incScore } },
+        create: {
+          userId,
+          categoryId,
+          score: incScore,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      throw new HttpException(
+        'Erreur lors de la mise à jour du score',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async getCategoryByArticleID(articleId: string): Promise<string> {
     try {
       const category = await this.prismaService.article.findFirst({
