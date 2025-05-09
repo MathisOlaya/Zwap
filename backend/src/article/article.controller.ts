@@ -24,7 +24,6 @@ import { User } from 'src/auth/decorators/user.decorator';
 
 // Services
 import { ArticleService } from './article.service';
-import { ArticleRegisterClick } from './dto/article-register-click.dto';
 import { isUUID } from 'class-validator';
 
 @Controller('articles')
