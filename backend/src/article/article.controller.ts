@@ -21,7 +21,7 @@ import { User } from 'src/auth/decorators/user.decorator';
 // Services
 import { ArticleService } from './article.service';
 
-@Controller('article')
+@Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
