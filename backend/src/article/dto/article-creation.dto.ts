@@ -37,4 +37,8 @@ export class ArticleCreationDto {
   @IsNotEmpty({ message: "Merci de fournir un prix à l'article" })
   @Type(() => Number)
   price: number;
+
+  @IsString({ message: "La catégorie sélectionnée n'est pas valide" })
+  @IsNotEmpty({ message: 'Merci de sélectionner une catégorie.' })
+  categoryId: string;
 }

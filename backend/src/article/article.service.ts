@@ -75,6 +75,7 @@ export class ArticleService {
           price: parseFloat(article.price.toString()),
           coverImg: imagesUrl[0],
           userId,
+          categoryId: article.categoryId,
         },
       });
 
@@ -112,5 +113,20 @@ export class ArticleService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+  async isCategoryValid(id: string): Promise<Boolean> {
+    if (!isUUID(id)) return false;
+
+    // Checking category
+    const category = await this.prismaService.category.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (category) {
+      return true;
+    }
+    return false;
   }
 }
