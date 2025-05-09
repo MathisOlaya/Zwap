@@ -114,6 +114,32 @@ export class ArticleService {
       );
     }
   }
+  async getCategoryByArticleID(articleId: string): Promise<string> {
+    try {
+      const category = await this.prismaService.article.findFirst({
+        where: { id: articleId },
+        select: { categoryId: true },
+      });
+
+      if (!category) {
+        throw new HttpException(
+          'Aucune catégorie trouvée pour cette article',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return category.categoryId;
+    } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+      throw new HttpException(
+        'Erreur lors la récupération de la catégorie',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async isCategoryValid(id: string): Promise<Boolean> {
     if (!isUUID(id)) return false;
 
