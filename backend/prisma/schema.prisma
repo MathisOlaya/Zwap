@@ -25,6 +25,7 @@ model User {
   stripe_customerId String?
   rate Int @default(0)
   articles Article[] 
+  userCategoryScores UserCategoryScore[]
   createdAt DateTime @default(now())
 }
 
@@ -39,6 +40,8 @@ model Article {
   images ArticleImages[]
   userId String @db.Uuid
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String @db.Uuid
+  category Category @relation(fields: [categoryId], references: [id])
 }
 
 model ArticleImages {
@@ -46,6 +49,22 @@ model ArticleImages {
   image String
   articleId String @db.Uuid
   article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  articles Article[]
+  userCategoryScores UserCategoryScore[]
+}
+
+model UserCategoryScore {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @unique @db.Uuid
+  categoryId String @unique @db.Uuid
+  score Int @default(0)
+  user User @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 }
 
 model Token{
