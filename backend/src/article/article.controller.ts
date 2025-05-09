@@ -37,6 +37,14 @@ export class ArticleController {
     // Validate images from user
     this.articleService.useImageValidator(files);
 
+    // Valid category
+    if (!(await this.articleService.isCategoryValid(article.categoryId))) {
+      throw new HttpException(
+        "La catégorie sélectionnée n'existe pas",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     // Create
     await this.articleService.create(article, files, userId);
   }
