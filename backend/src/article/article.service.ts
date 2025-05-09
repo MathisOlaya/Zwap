@@ -75,6 +75,7 @@ export class ArticleService {
           price: parseFloat(article.price.toString()),
           coverImg: imagesUrl[0],
           userId,
+          categoryId: article.categoryId,
         },
       });
 
