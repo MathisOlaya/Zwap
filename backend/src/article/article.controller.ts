@@ -80,7 +80,36 @@ export class ArticleController {
     const categoryId =
       await this.articleService.getCategoryByArticleID(articleId);
 
-    // Update
+    // Update user category score
     await this.articleService.updateUserCategoryScore(categoryId, userId, 1);
+
+    // Update article click count
+    await this.articleService.incrementArticleClick(articleId);
+  }
+
+  // Update user category score on like
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/like')
+  async registerLike(
+    @Param('id') articleId: string,
+    @User('id') userId: string,
+  ) {
+    // Is Valid ArticleID
+    if (!isUUID(articleId)) {
+      throw new HttpException(
+        "L'article sélectionné n'est pas valide",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Get Category id
+    const categoryId =
+      await this.articleService.getCategoryByArticleID(articleId);
+
+    // Update user category score
+    await this.articleService.updateUserCategoryScore(categoryId, userId, 3);
+
+    // Update article like count
+    await this.articleService.incrementArticleLike(articleId);
   }
 }
