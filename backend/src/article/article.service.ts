@@ -165,6 +165,20 @@ export class ArticleService {
     }
   }
 
+  async incrementArticleClick(articleId: string): Promise<void> {
+    await this.prismaService.article.update({
+      where: { id: articleId },
+      data: { clickCount: { increment: 1 } },
+    });
+  }
+
+  async incrementArticleLike(articleId: string): Promise<void> {
+    await this.prismaService.article.update({
+      where: { id: articleId },
+      data: { likeCount: { increment: 1 } },
+    });
+  }
+
   async isCategoryValid(id: string): Promise<Boolean> {
     if (!isUUID(id)) return false;
 
