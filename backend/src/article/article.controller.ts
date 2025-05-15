@@ -112,4 +112,26 @@ export class ArticleController {
     // Update article like count
     await this.articleService.incrementArticleLike(articleId);
   }
+
+  // Get Best Articles For User
+  @UseGuards(JwtAuthGuard)
+  @Get('/foryou')
+  async articleRecommendation(@User('id') userId: string) {
+    // Is Valid UserId
+    if (!isUUID(userId)) {
+      throw new HttpException(
+        "L'article sélectionné n'est pas valide",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Get best categories
+    const categoriesID =
+      await this.articleService.getBestCategoriesForUser(userId);
+
+    // Fetching articles
+    const articles = this.articleService.getArticlesForUser(categoriesID);
+
+    return articles;
+  }
 }

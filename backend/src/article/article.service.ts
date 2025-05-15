@@ -6,7 +6,10 @@ import { ArticleCreationDto } from './dto/article-creation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { isUUID } from 'class-validator';
-import { Category } from '@prisma/client';
+import { Article, Category, UserCategoryScore } from '@prisma/client';
+
+// Helpers
+import { calcPopularityScore } from './helpers/article.helper';
 
 @Injectable()
 export class ArticleService {
@@ -166,17 +169,157 @@ export class ArticleService {
   }
 
   async incrementArticleClick(articleId: string): Promise<void> {
-    await this.prismaService.article.update({
-      where: { id: articleId },
-      data: { clickCount: { increment: 1 } },
-    });
+    try {
+      const article = await this.getArticleById(articleId);
+
+      // Calculating popularity score
+      const popularityScore = calcPopularityScore(
+        article.clickCount + 1,
+        article.likeCount,
+      );
+
+      await this.prismaService.article.update({
+        where: { id: articleId },
+        data: {
+          clickCount: { increment: 1 },
+          popularityScore: popularityScore,
+        },
+      });
+    } catch {
+      throw new HttpException(
+        'Une erreur serveur est intervenue',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async incrementArticleLike(articleId: string): Promise<void> {
-    await this.prismaService.article.update({
-      where: { id: articleId },
-      data: { likeCount: { increment: 1 } },
-    });
+    try {
+      const article = await this.getArticleById(articleId);
+
+      // Calculating popularity score
+      const popularityScore = calcPopularityScore(
+        article.clickCount,
+        article.likeCount + 1,
+      );
+
+      await this.prismaService.article.update({
+        where: { id: articleId },
+        data: { likeCount: { increment: 1 }, popularityScore },
+      });
+    } catch {
+      throw new HttpException(
+        'Une erreur serveur est intervenue',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getArticleById(articleId: string): Promise<Article> {
+    try {
+      return await this.prismaService.article.findFirstOrThrow({
+        where: { id: articleId },
+      });
+    } catch {
+      throw new HttpException(
+        'Une erreur serveur est intervenue',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getBestCategoriesForUser(userId: string): Promise<Array<any>> {
+    // Get all categories ID
+    try {
+      const categoriesId = await this.prismaService.userCategoryScore.findMany({
+        where: { userId: userId },
+        select: { categoryId: true, score: true },
+        orderBy: { score: 'desc' },
+        take: 3,
+      });
+
+      return categoriesId;
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la récupération des articles',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getArticlesByCategoriesId(
+    categoriesId: Array<UserCategoryScore>,
+  ): Promise<Array<Article>> {
+    try {
+      const articlesNested: Article[][] = await Promise.all(
+        categoriesId.map(async (category) => {
+          const articles = await this.prismaService.article.findMany({
+            where: { categoryId: category.categoryId },
+            orderBy: { popularityScore: 'desc' },
+            take: 3,
+          });
+
+          return articles; // pas besoin de vérifier s'ils existent ici
+        }),
+      );
+
+      const articles: Article[] = articlesNested.flat(); // aplatit [[...], [...]] => [...]
+
+      return articles;
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la récupération des articles',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getArticlesForUser(
+    categoriesId: Array<UserCategoryScore>,
+  ): Promise<Array<Article>> {
+    try {
+      const articlesNested: Article[][] = await Promise.all(
+        categoriesId.map(async (category) => {
+          const articles = await this.prismaService.article.findMany({
+            where: { categoryId: category.categoryId },
+            orderBy: { popularityScore: 'desc' },
+            take: 3,
+          });
+
+          return articles; // pas besoin de vérifier s'ils existent ici
+        }),
+      );
+
+      const articles: Article[] = articlesNested.flat(); // [[...], [...]] => [...]
+
+      // User may not like any category, so articles will be empty or not full (3 articles per category = 9)
+      if (articles.length < 9) {
+        // So adding the rest (best articles per ratio)
+        const limit = 9 - articles.length;
+        const lastArticles: Article[] =
+          await this.prismaService.article.findMany({
+            orderBy: { popularityScore: 'desc' },
+            take: limit,
+          });
+
+        // Pushing new articles to list
+        articles.push(...lastArticles);
+      }
+
+      if (!articles) {
+        throw new HttpException(
+          'Erreur lors de la récupération des articles',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return articles;
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la récupération des articles',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async isCategoryValid(id: string): Promise<Boolean> {
