@@ -233,6 +233,25 @@ export class ArticleService {
     }
   }
 
+  async getBestCategoriesForUser(userId: string): Promise<Array<any>> {
+    // Get all categories ID
+    try {
+      const categoriesId = await this.prismaService.userCategoryScore.findMany({
+        where: { userId: userId },
+        select: { categoryId: true, score: true },
+        orderBy: { score: 'desc' },
+        take: 3,
+      });
+
+      return categoriesId;
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la récupération des articles',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async getArticlesByCategoriesId(
     categoriesId: Array<UserCategoryScore>,
   ): Promise<Array<Article>> {
