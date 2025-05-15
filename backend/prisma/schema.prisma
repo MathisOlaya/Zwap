@@ -37,6 +37,7 @@ model Article {
   price Float
   clickCount Int @default(0)
   likeCount Int @default(0)
+  popularityScore Float @default(0)
   coverImg String
   images ArticleImages[]
   userId String @db.Uuid
