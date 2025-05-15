@@ -233,6 +233,32 @@ export class ArticleService {
     }
   }
 
+  async getArticlesByCategoriesId(
+    categoriesId: Array<UserCategoryScore>,
+  ): Promise<Array<Article>> {
+    try {
+      const articlesNested: Article[][] = await Promise.all(
+        categoriesId.map(async (category) => {
+          const articles = await this.prismaService.article.findMany({
+            where: { categoryId: category.categoryId },
+            orderBy: { popularityScore: 'desc' },
+            take: 3,
+          });
+
+          return articles; // pas besoin de vérifier s'ils existent ici
+        }),
+      );
+
+      const articles: Article[] = articlesNested.flat(); // aplatit [[...], [...]] => [...]
+
+      return articles;
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la récupération des articles',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
   }
 
   async isCategoryValid(id: string): Promise<Boolean> {
