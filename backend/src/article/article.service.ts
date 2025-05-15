@@ -7,6 +7,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { isUUID } from 'class-validator';
 import { Category } from '@prisma/client';
+import { Article, Category, UserCategoryScore } from '@prisma/client';
+
+// Helpers
+import { calcPopularityScore } from './helpers/article.helper';
 
 @Injectable()
 export class ArticleService {
@@ -170,13 +174,52 @@ export class ArticleService {
       where: { id: articleId },
       data: { clickCount: { increment: 1 } },
     });
+    try {
+      const article = await this.getArticleById(articleId);
+
+      // Calculating popularity score
+      const popularityScore = calcPopularityScore(
+        article.clickCount + 1,
+        article.likeCount,
+      );
+
+      await this.prismaService.article.update({
+        where: { id: articleId },
+        data: {
+          clickCount: { increment: 1 },
+          popularityScore: popularityScore,
+        },
+      });
+    } catch {
+      throw new HttpException(
+        'Une erreur serveur est intervenue',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async incrementArticleLike(articleId: string): Promise<void> {
-    await this.prismaService.article.update({
-      where: { id: articleId },
-      data: { likeCount: { increment: 1 } },
-    });
+    try {
+      const article = await this.getArticleById(articleId);
+
+      // Calculating popularity score
+      const popularityScore = calcPopularityScore(
+        article.clickCount,
+        article.likeCount + 1,
+      );
+
+      await this.prismaService.article.update({
+        where: { id: articleId },
+        data: { likeCount: { increment: 1 }, popularityScore },
+      });
+    } catch {
+      throw new HttpException(
+        'Une erreur serveur est intervenue',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   }
 
   async isCategoryValid(id: string): Promise<Boolean> {
