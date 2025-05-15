@@ -278,6 +278,53 @@ export class ArticleService {
       );
     }
   }
+
+  async getArticlesForUser(
+    categoriesId: Array<UserCategoryScore>,
+  ): Promise<Array<Article>> {
+    try {
+      const articlesNested: Article[][] = await Promise.all(
+        categoriesId.map(async (category) => {
+          const articles = await this.prismaService.article.findMany({
+            where: { categoryId: category.categoryId },
+            orderBy: { popularityScore: 'desc' },
+            take: 3,
+          });
+
+          return articles; // pas besoin de vérifier s'ils existent ici
+        }),
+      );
+
+      const articles: Article[] = articlesNested.flat(); // [[...], [...]] => [...]
+
+      // User may not like any category, so articles will be empty or not full (3 articles per category = 9)
+      if (articles.length < 9) {
+        // So adding the rest (best articles per ratio)
+        const limit = 9 - articles.length;
+        const lastArticles: Article[] =
+          await this.prismaService.article.findMany({
+            orderBy: { popularityScore: 'desc' },
+            take: limit,
+          });
+
+        // Pushing new articles to list
+        articles.push(...lastArticles);
+      }
+
+      if (!articles) {
+        throw new HttpException(
+          'Erreur lors de la récupération des articles',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return articles;
+    } catch {
+      throw new HttpException(
+        'Erreur lors de la récupération des articles',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async isCategoryValid(id: string): Promise<Boolean> {
