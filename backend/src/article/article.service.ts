@@ -220,6 +220,19 @@ export class ArticleService {
     }
   }
 
+  async getArticleById(articleId: string): Promise<Article> {
+    try {
+      return await this.prismaService.article.findFirstOrThrow({
+        where: { id: articleId },
+      });
+    } catch {
+      throw new HttpException(
+        'Une erreur serveur est intervenue',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   }
 
   async isCategoryValid(id: string): Promise<Boolean> {
