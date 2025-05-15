@@ -6,7 +6,6 @@ import { ArticleCreationDto } from './dto/article-creation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { isUUID } from 'class-validator';
-import { Category } from '@prisma/client';
 import { Article, Category, UserCategoryScore } from '@prisma/client';
 
 // Helpers
@@ -170,10 +169,6 @@ export class ArticleService {
   }
 
   async incrementArticleClick(articleId: string): Promise<void> {
-    await this.prismaService.article.update({
-      where: { id: articleId },
-      data: { clickCount: { increment: 1 } },
-    });
     try {
       const article = await this.getArticleById(articleId);
 
