@@ -12,6 +12,7 @@ export default function RootLayout() {
   // Fonts
   const [loaded, error] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins/Poppins-Regular.ttf"),
+    "Poppins-Medium": require("../assets/fonts/Poppins/Poppins-Medium.ttf"),
     "Poppins-LightItalic": require("../assets/fonts/Poppins/Poppins-LightItalic.ttf"),
   });
 
