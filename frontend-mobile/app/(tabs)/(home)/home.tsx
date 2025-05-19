@@ -1,14 +1,24 @@
 import { useAuth } from "@/context/AuthContext";
 import { Button, Text, View, StyleSheet, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect } from "react";
 
 // Responsive
 import { font, width, height, gapH, gapV } from "@/utils/responsive";
 
 // Temp : Icons (then Lucid)
+// Components
+import Header from "@/components/MainPage/header";
+import ArticleDisplayer from "@/components/Articles/ArticleDisplayer";
+
+// API
+import { useInitialData } from "@/hooks/useInitialData";
 
 export default function HomeScreen() {
   const { signOut } = useAuth();
+  // API Request
+  const articlesRecommendation = useInitialData();
+
   return (
     <SafeAreaView style={styles.page}>
       <View style={styles.header}>
