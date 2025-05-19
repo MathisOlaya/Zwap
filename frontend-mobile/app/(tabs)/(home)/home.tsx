@@ -19,6 +19,17 @@ export default function HomeScreen() {
   // API Request
   const articlesRecommendation = useInitialData();
 
+  // Displaying loading page when articles are not loader
+  if (!articlesRecommendation.length) {
+    return (
+      <SafeAreaView style={styles.page}>
+        <Header />
+        <Text>Chargement...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // View
   return (
     <SafeAreaView style={styles.page}>
       <View style={styles.header}>
