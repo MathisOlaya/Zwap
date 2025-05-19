@@ -290,7 +290,14 @@ export class ArticleService {
         }),
       );
 
-      const articles: Article[] = articlesNested.flat(); // [[...], [...]] => [...]
+      const allArticles: Article[] = articlesNested.flat(); // [[...], [...]] => [...]
+
+      const uniqueArticlesMap = new Map<string, Article>();
+      allArticles.forEach((article) => {
+        uniqueArticlesMap.set(article.id, article);
+      });
+
+      let articles: Article[] = Array.from(uniqueArticlesMap.values());
 
       // User may not like any category, so articles will be empty or not full (3 articles per category = 9)
       if (articles.length < 9) {
@@ -300,10 +307,16 @@ export class ArticleService {
           await this.prismaService.article.findMany({
             orderBy: { popularityScore: 'desc' },
             take: limit,
+            where: {
+              // Excluding existing articles
+              id: {
+                notIn: articles.map((a) => a.id),
+              },
+            },
           });
 
         // Pushing new articles to list
-        articles.push(...lastArticles);
+        articles = [...articles, ...lastArticles];
       }
 
       if (!articles) {
