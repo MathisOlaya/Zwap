@@ -139,4 +139,11 @@ export class AuthController {
       );
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async verifyAuthentication(@Req() req: Request) {
+    // If user can access this, he's connected
+    return { authenticated: true };
+  }
 }
