@@ -1,9 +1,10 @@
+import AuthService from "@/services/AuthService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 // Define type
 type AuthContextType = {
-  isAuthenticated: boolean;
+  isAuthenticated: Boolean;
   signIn: (id: string) => void;
   signOut: () => void;
 };
@@ -11,35 +12,33 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setUserAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setUserAuthenticated] = useState<Boolean>(false);
 
   // At start
   useEffect(() => {
-    const loadToken = async () => {
-      const userId = await AsyncStorage.getItem("userId");
-
-      // Is he logged ?
-      if (userId && !isAuthenticated) {
-        setUserAuthenticated(true);
-      }
+    const verifyAuthentication = async () => {
+      const isAuth = await AuthService.isAuthenticated();
+      setUserAuthenticated(isAuth);
     };
-    loadToken();
+    verifyAuthentication();
   }, []);
 
   const signIn = async (id: string) => {
     // Set user as authenticated
     setUserAuthenticated(true);
 
-    // Store it localy
+    // Store user id
     await AsyncStorage.setItem("userId", id);
   };
 
   const signOut = async () => {
-    // Set user as logged out
-    setUserAuthenticated(false);
+    if (await AuthService.logout()) {
+      // Set user as logged out
+      setUserAuthenticated(false);
 
-    // Remove from local storage
-    await AsyncStorage.removeItem("userId");
+      // Remove from local storage
+      await AsyncStorage.removeItem("userId");
+    }
   };
 
   // Return provider
