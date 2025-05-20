@@ -68,6 +68,22 @@ class AuthService {
     }
   }
 
+  static async logout(): Promise<Boolean> {
+    try {
+      const response = await apiClient.get("logout");
+      return response.status === HttpStatusCode.Ok;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        // Axios error from backend
+        const message = Array.isArray(err.response?.data.message)
+          ? err.response?.data.message[0] || "Une erreur est survenue"
+          : err.response?.data.message || "Une erreur est survenue";
+
+        throw new Error(message);
+      }
+      throw new Error("Une erreur est survenue");
+    }
+  }
 }
 
 export default AuthService;
