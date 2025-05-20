@@ -25,10 +25,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (id: string) => {
     // Set user as authenticated
-    setUserAuthenticated(true);
-
-    // Store user id
-    await AsyncStorage.setItem("userId", id);
+    try {
+      await AsyncStorage.setItem("userId", id);
+      setUserAuthenticated(true);
+    } catch (err) {
+      console.error("Failed to store userId:", err);
+      setUserAuthenticated(false);
+    }
   };
 
   const signOut = async () => {
