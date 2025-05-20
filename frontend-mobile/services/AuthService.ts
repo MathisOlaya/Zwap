@@ -58,6 +58,16 @@ class AuthService {
       throw new Error("Une erreur est survenue");
     }
   }
+
+  static async isAuthenticated(): Promise<Boolean> {
+    try {
+      const response = await apiClient.get("me");
+      return response.status === HttpStatusCode.Ok && response.data.authenticated === true;
+    } catch {
+      return false;
+    }
+  }
+
 }
 
 export default AuthService;
