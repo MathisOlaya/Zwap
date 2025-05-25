@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // Components
@@ -20,11 +20,13 @@ import AuthService from "@/services/AuthService";
 
 // Context
 import { useAuth } from "@/context/AuthContext";
+import Loader from "@/components/Loader";
 
 export default function LoginScreen() {
   // Inputs value
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Button
   const [disabled, setDisabled] = useState(false);
@@ -49,15 +51,15 @@ export default function LoginScreen() {
       // Disable button request
       setDisabled(true);
 
+      // Show loader
+      setIsLoading(true);
+
       const response = await AuthService.loginUser(user);
 
       if (response) {
         // Log in
         signIn(response.user.id);
       }
-
-      // Enable button
-      setDisabled(false);
     } catch (err) {
       if (err instanceof Error) {
         Toast.show({
@@ -66,9 +68,10 @@ export default function LoginScreen() {
           text2: err.message,
         });
       }
-
+    } finally {
       // Enable button
       setDisabled(false);
+      setIsLoading(false);
     }
   };
 
@@ -91,6 +94,7 @@ export default function LoginScreen() {
           <Link href="/register">Pas de compte ? En créer un</Link>
         </View>
       </View>
+      <Loader enabled={isLoading} />
     </SafeAreaView>
   );
 }

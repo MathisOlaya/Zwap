@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 
 // Components
+import Loader from "@/components/Loader";
 import Caption from "@/components/Secondary/Caption";
 import Toast from "react-native-toast-message";
 import Input from "@/components/Input";
@@ -28,6 +29,11 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Button
+  const [disabled, setDisabled] = useState(false);
+  // Loader
+  const [isLoading, setIsLoading] = useState(false);
+
   const { signIn } = useAuth();
 
   // Register
@@ -41,6 +47,11 @@ export default function RegisterScreen() {
     };
 
     try {
+      // Disable button request
+      setDisabled(true);
+      // Show loader
+      setIsLoading(true);
+
       // Are inputs valid
       const validation = registerSchema.safeParse(user);
 
@@ -66,6 +77,9 @@ export default function RegisterScreen() {
           text2: err.message,
         });
       }
+    } finally {
+      setIsLoading(false);
+      setDisabled(false);
     }
   };
 
@@ -83,12 +97,13 @@ export default function RegisterScreen() {
           </View>
         </View>
         <View style={styles.loginButtonContainer}>
-          <Button text="Créer un compte" onClick={register} />
+          <Button text="Créer un compte" onClick={register} disabled={disabled} />
           <Link href="/" style={styles.loginText}>
             Déjà un compte ? Se connecter
           </Link>
         </View>
       </View>
+      <Loader enabled={isLoading} />
     </SafeAreaView>
   );
 }
