@@ -10,5 +10,6 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
   imports: [JwtModule, CloudinaryModule],
   providers: [ArticleService, JwtAuthGuard, PrismaService],
   controllers: [ArticleController],
+  exports: [ArticleService],
 })
 export class ArticleModule {}
