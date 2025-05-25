@@ -35,21 +35,28 @@ export class AuthService {
   async validateUser(userInput: LoginUserDto) {
     const { email, password } = userInput;
 
-    const user = await this.prisma.user.findFirst({
-      where: { email: email.toLowerCase() },
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { email: email.toLowerCase() },
+      });
 
-    // None
-    if (!user) {
-      throw new BadRequestException('Identifiants incorrectes');
+      // None
+      if (!user) {
+        throw new BadRequestException('Identifiants incorrectes');
+      }
+
+      // Compare password
+      if (!(await bcrypt.compare(password, user.password))) {
+        throw new BadRequestException('Identifiants incorrectes');
+      }
+
+      return this.sanitizeUserJwt(user);
+    } catch {
+      throw new HttpException(
+        'Une erreur du serveur est intervenue.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    // Compare password
-    if (!(await bcrypt.compare(password, user.password))) {
-      throw new BadRequestException('Identifiants incorrectes');
-    }
-
-    return this.sanitizeUserJwt(user);
   }
   async registerUser(userInput: RegisterUserDto) {
     // Are email & PhoneNumber available
@@ -67,27 +74,34 @@ export class AuthService {
       );
     }
 
-    // Hash password using Bcrypt
-    const password: string = await bcrypt.hash(userInput.password, 10);
+    try {
+      // Hash password using Bcrypt
+      const password: string = await bcrypt.hash(userInput.password, 10);
 
-    // Lower case email only
-    userInput.email = userInput.email.toLowerCase();
+      // Lower case email only
+      userInput.email = userInput.email.toLowerCase();
 
-    // Store user into DB
-    const user: User = await this.prisma.user.create({
-      data: { ...userInput, password: password },
-    });
+      // Store user into DB
+      const user: User = await this.prisma.user.create({
+        data: { ...userInput, password: password },
+      });
 
-    // Create stripe account user
-    const customer: Stripe.Customer = await this.stripe.createUser(user);
+      // Create stripe account user
+      const customer: Stripe.Customer = await this.stripe.createUser(user);
 
-    // Store stripe id to user database
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { stripe_customerId: customer.id },
-    });
+      // Store stripe id to user database
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { stripe_customerId: customer.id },
+      });
 
-    return this.sanitizeUserJwt(user);
+      return this.sanitizeUserJwt(user);
+    } catch {
+      throw new HttpException(
+        'Une erreur du serveur est intervenue.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async updatePassword(email: string, password: string) {
