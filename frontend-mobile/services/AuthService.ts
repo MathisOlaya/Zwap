@@ -7,6 +7,8 @@ import { UserLoginInput, UserRegisterInput } from "@/types/user";
 // Env
 import Constants from "expo-constants";
 
+import { extractAxiosErrorMessage, safePost } from "@/utils/api";
+
 const apiClient = axios.create({
   baseURL: `${Constants.expoConfig?.extra?.apiUrl}/auth`,
   withCredentials: true,
@@ -18,45 +20,11 @@ const apiClient = axios.create({
 
 class AuthService {
   static async loginUser(User: UserLoginInput) {
-    try {
-      const response = await apiClient.post("/login", User);
-
-      if (response.status === HttpStatusCode.Ok) {
-        // Ok
-        return response.data;
-      }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        // Axios error from backend
-        const message = Array.isArray(err.response?.data.message)
-          ? err.response?.data.message[0] || "Une erreur est survenue"
-          : err.response?.data.message || "Une erreur est survenue";
-
-        throw new Error(message);
-      }
-      throw new Error("Une erreur est survenue");
-    }
+    return await safePost("/auth/login", User);
   }
 
   static async registerUser(User: UserRegisterInput) {
-    try {
-      const response = await apiClient.post("/register", User);
-
-      if (response.status === HttpStatusCode.Created) {
-        // Ok
-        return response.data;
-      }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        // Axios error from backend
-        const message = Array.isArray(err.response?.data.message)
-          ? err.response?.data.message[0] || "Une erreur est survenue"
-          : err.response?.data.message || "Une erreur est survenue";
-
-        throw new Error(message);
-      }
-      throw new Error("Une erreur est survenue");
-    }
+    return await safePost("/auth/register", User);
   }
 
   static async isAuthenticated(): Promise<Boolean> {
@@ -73,15 +41,7 @@ class AuthService {
       const response = await apiClient.get("logout");
       return response.status === HttpStatusCode.Ok;
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        // Axios error from backend
-        const message = Array.isArray(err.response?.data.message)
-          ? err.response?.data.message[0] || "Une erreur est survenue"
-          : err.response?.data.message || "Une erreur est survenue";
-
-        throw new Error(message);
-      }
-      throw new Error("Une erreur est survenue");
+      throw new Error(extractAxiosErrorMessage(err));
     }
   }
 }
