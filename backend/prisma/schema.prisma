@@ -56,6 +56,7 @@ model ArticleImages {
 model Category {
   id String @id @default(uuid()) @db.Uuid
   name String
+  coverUrl String
   articles Article[]
   userCategoryScores UserCategoryScore[]
 }

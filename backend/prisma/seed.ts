@@ -52,6 +52,7 @@ async function main() {
     'Déguisements',
   ];
 
+  // console.log('Here');
   // Insert Token
   const token = await prisma.token.create({
     data: {
@@ -65,12 +66,12 @@ async function main() {
     return await prisma.category.create({
       data: {
         name: category,
+        coverUrl: 'fake url',
       },
     });
   });
 
   const pwd = await bcrypt.hash('root', 10);
-  console.log(pwd);
   const user = await prisma.user.create({
     data: {
       firstname: 'Root',
