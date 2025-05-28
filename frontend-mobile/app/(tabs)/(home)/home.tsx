@@ -15,17 +15,7 @@ import { useInitialData } from "@/hooks/useInitialData";
 
 export default function HomeScreen() {
   // API Request
-  const articlesRecommendation = useInitialData();
-
-  // Displaying loading page when articles are not loader
-  if (!articlesRecommendation.length) {
-    return (
-      <SafeAreaView style={styles.page}>
-        <Header />
-        <Text>Chargement...</Text>
-      </SafeAreaView>
-    );
-  }
+  const { articlesRecommendation, favCategory, error } = useInitialData();
 
   // View
   return (
