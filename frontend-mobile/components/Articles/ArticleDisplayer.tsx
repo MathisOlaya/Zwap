@@ -20,6 +20,15 @@ type Props = {
 };
 
 const ArticleDisplayer = (info: Props) => {
+  // If articles are loading
+  if (info.articles.length === 0) {
+    return (
+      <View style={styles.maincontainer}>
+        <ItalicTitle>{info.title}</ItalicTitle>
+        <Text style={{ textAlign: "center", paddingVertical: gapH(32) }}>Chargement...</Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.maincontainer}>
       <ItalicTitle>{info.title}</ItalicTitle>
