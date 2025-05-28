@@ -1,5 +1,7 @@
-// ReactNative
-import { View, StyleSheet, Image, Text } from "react-native";
+// React Native
+import React, { useState } from "react";
+import { View, StyleSheet, ActivityIndicator, Text } from "react-native";
+import { Image } from "expo-image";
 
 // Responsive
 import { font, width, height, gapH, gapV } from "@/utils/responsive";
@@ -11,12 +13,24 @@ type ArticleCardProps = {
 };
 
 const ArticleCard = ({ article }: ArticleCardProps) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
   return (
     <View style={styles.container}>
-      <Image source={{ uri: article.coverImg }} style={styles.cover} />
+      {loading && !error && <ActivityIndicator size="small" color="#999" style={StyleSheet.absoluteFill} />}
+      <Image
+        source={{ uri: article.coverImg }}
+        style={styles.cover}
+        contentFit="cover"
+        onLoadStart={() => {
+          setLoading(true);
+          setError(false);
+        }}
+      />
       <View style={styles.infos}>
         <Text style={styles.name}>{article.name}</Text>
-        <Text style={styles.price}>{article.price.toPrecision(2)}.-</Text>
+        <Text style={styles.price}>{article.price.toFixed(2)}.-</Text>
       </View>
     </View>
   );
