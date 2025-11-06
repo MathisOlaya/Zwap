@@ -9,6 +9,7 @@ Toutes les routes ne sont malheureusement pas encore implémentées dans le Fron
 
 ## Authentification sur mobile
 Utilisation des cookies sécurisés.
+
 <img width="383" height="857" alt="image" src="https://github.com/user-attachments/assets/b85fa048-5c6c-44c3-ab08-1c0d7a5fd172" />
 
 ## Gestion des erreurs
